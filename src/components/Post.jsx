@@ -1,34 +1,50 @@
+import { format, formatDistanceToNow } from 'date-fns'
+import ptBR from 'date-fns/locale/pt-BR'
+
+import { Avatar } from './Avatar';
+import { Comment } from './Comment';
 import styles from './Post.module.css';
 
-export function Post() {
+export function Post({ author, publishedAt, content }) {
+
+  const publishedDateFormatted = format(publishedAt, "d 'de' LLLL 'às' HH:mm'h'", {
+    locale: ptBR,
+  })
+
+  const publishedDateRelativeToNow = formatDistanceToNow(publishedAt, {
+    locale: ptBR, 
+    addSuffix: true
+  })
+
   return (
     <article className={styles.post}>
       <header>
         <div className={styles.author}>
-          <img className={styles.avatar} src="https://github.com/MP-oliveira.png" />
+          <Avatar src={author.avatarUrl} />
           <div className={styles.authorInfo}>
-            <strong>Mauricio Oliveira</strong>
-            <span>Web Developer</span>
+            <strong>{author.name}</strong>
+            <span>{author.role}</span>
           </div>
         </div>
 
         <time
-          title="11 de maio às 08:07h"
-          datetime='2022-05-11 08:07:30'>Publicado há uma hora
+          title={publishedDateFormatted}
+          datetime={publishedAt.toISOString()}
+          >
+          {publishedDateRelativeToNow}
         </time>
       </header>
 
       <div className={styles.content}>
-        <p>Fala galera</p>
-        <p>Acabei de subir mais um projeto pro meu portifolio</p>
-        <p> <a href="#">jane.design/dotocare</a></p>
-        <p> <a href="#">
-          #novoprojeto
-        </a>{" "}
-          <a href="#">
-            #nlw
-          </a>
-        </p>
+       {content.map(line => {
+        if(line.type === 'paragraph'){
+          return <p>{line.content}</p>
+        }else if(line.type === 'link'){
+          return <p><a href='#'>{line.content}</a></p>
+        }else {
+           
+        }
+       })}
       </div>
 
       <form className={styles.comentForm}>
@@ -40,8 +56,14 @@ export function Post() {
 
         <footer>
           <button type='submit'>Publicar</button>
-        </footer> 
+        </footer>
       </form>
+
+      <div className={styles.commentList}>
+        <Comment />
+        <Comment />
+        <Comment />
+      </div>
     </article>
   )
 }
